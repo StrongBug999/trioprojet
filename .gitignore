@@ -1,0 +1,13 @@
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Journaux et temporaires
+*.log
+*.tmp
+
+# Environnements de développement
+node_modules/
+.vscode/
+.idea/
