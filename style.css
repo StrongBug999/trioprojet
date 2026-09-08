@@ -13,11 +13,13 @@
   --accent-hover: #0077ED;
   --accent-active: #006EDB;
   --chip-bg: #F5F5F7;
+  --chip-hover: #EBEBF0;
   --danger: #E30000;
   --radius-card: 20px;
   --radius-pill: 980px;
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04), 0 12px 40px rgba(0, 0, 0, 0.06);
   --shadow-card-hover: 0 4px 18px rgba(0, 0, 0, 0.06), 0 16px 48px rgba(0, 0, 0, 0.08);
+  --shadow-popover: 0 4px 14px rgba(0, 0, 0, 0.08), 0 16px 56px rgba(0, 0, 0, 0.18);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -125,7 +127,7 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   font-size: clamp(17px, 2.4vw, 21px);
   line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 560px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
@@ -207,6 +209,118 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
 
 .feedback.visible { opacity: 1; }
 
+/* ---------- Sélecteur de durée ---------- */
+
+.duree-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: 12px;
+  padding: 11px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+}
+
+.duree-btn:hover { background: var(--chip-hover); }
+
+.duree-btn .chev {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.add-row-tache input { flex: 1.4; }
+
+/* ---------- Popover de durée ---------- */
+
+.popover {
+  position: absolute;
+  z-index: 60;
+  width: 236px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow-popover);
+  padding: 14px;
+  animation: riseIn 0.18s cubic-bezier(0.25, 0.8, 0.35, 1) both;
+}
+
+.popover-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 10px;
+}
+
+.popover-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.popover-grid button {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: 9px;
+  padding: 8px 0;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.popover-grid button:hover { background: var(--chip-hover); }
+
+.popover-grid button.selected {
+  background: var(--accent);
+  color: #fff;
+}
+
+.popover-custom {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.popover-custom input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 14px;
+  padding: 7px 10px;
+  border: 1px solid #D2D2D7;
+  border-radius: 9px;
+  outline: none;
+}
+
+.popover-custom input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.12);
+}
+
+.popover-custom button {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent);
+  background: rgba(0, 113, 227, 0.08);
+  border: none;
+  border-radius: 9px;
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.popover-custom button:hover { background: rgba(0, 113, 227, 0.14); }
+
 /* ---------- Chips ---------- */
 
 .chips {
@@ -220,7 +334,7 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
 .chips li {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   background: var(--chip-bg);
   border-radius: var(--radius-pill);
   padding: 8px 9px 8px 16px;
@@ -229,7 +343,25 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   animation: riseIn 0.35s cubic-bezier(0.25, 0.8, 0.35, 1) both;
 }
 
-.chips li button {
+.duree-badge {
+  font-size: 12.5px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: var(--chip-hover);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 3px 9px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.duree-badge:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.chips li button.retrait {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -245,7 +377,7 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   transition: background 0.2s ease, color 0.2s ease;
 }
 
-.chips li button:hover { background: var(--danger); color: #fff; }
+.chips li button.retrait:hover { background: var(--danger); color: #fff; }
 
 .empty-note {
   font-size: 14px;
@@ -267,7 +399,10 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
 
 .btn:active { transform: scale(0.97); }
 
-.btn:focus-visible {
+.btn:focus-visible,
+.duree-btn:focus-visible,
+.duree-badge:focus-visible,
+.popover button:focus-visible {
   outline: 3px solid rgba(0, 113, 227, 0.45);
   outline-offset: 2px;
 }
@@ -278,7 +413,7 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   color: var(--text);
 }
 
-.btn-secondary:hover { background: #EBEBF0; }
+.btn-secondary:hover { background: var(--chip-hover); }
 
 .btn-primary {
   display: block;
@@ -342,9 +477,21 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
-.result-actions { display: flex; gap: 10px; }
+.balance-pill {
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  background: var(--chip-bg);
+  border-radius: var(--radius-pill);
+  padding: 6px 13px;
+  letter-spacing: 0;
+}
+
+.result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
 .result-grid {
   display: grid;
@@ -388,21 +535,27 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   flex-shrink: 0;
 }
 
-.count-badge {
+.total-badge {
   font-size: 13px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
   background: var(--chip-bg);
   border-radius: var(--radius-pill);
   padding: 4px 11px;
+  white-space: nowrap;
 }
 
 .member-card ul { list-style: none; }
 
 .member-card ul li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
   font-size: 15px;
   color: var(--text);
-  padding: 9px 0 9px 24px;
+  padding: 9px 0 9px 22px;
   position: relative;
   border-bottom: 1px solid #F0F0F2;
 }
@@ -420,6 +573,13 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   border-radius: 50%;
   background: var(--accent);
   opacity: 0.75;
+}
+
+.member-card ul li .tache-duree {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  white-space: nowrap;
 }
 
 /* ---------- Footer ---------- */
@@ -453,6 +613,8 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 50;
+  max-width: 90vw;
+  text-align: center;
 }
 
 .toast.visible {
@@ -467,4 +629,8 @@ main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 0 22px 8
   .hero { padding: 48px 0 40px; }
   .card { padding: 22px; }
   .result-head { flex-direction: column; align-items: flex-start; }
+  .add-row-tache { flex-wrap: wrap; }
+  .add-row-tache input { flex: 1 1 100%; }
+  .duree-btn { flex: 1; justify-content: center; }
+  .add-row-tache .btn-secondary { flex: 1; }
 }

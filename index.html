@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="TrioProjet — Répartissez équitablement les tâches de vos projets de groupe. Gratuit, sans compte, tout reste sur votre appareil.">
+  <meta name="description" content="TrioProjet — Répartissez équitablement les tâches de vos projets de groupe, en tenant compte du temps que chacune demande. Gratuit, sans compte, rien ne quitte votre appareil.">
+  <meta name="theme-color" content="#F5F5F7">
   <meta property="og:title" content="TrioProjet — Le projet de groupe, enfin bien réparti">
-  <meta property="og:description" content="Ajoutez les membres, ajoutez les tâches, TrioProjet répartit équitablement. Gratuit et sans inscription.">
+  <meta property="og:description" content="Les membres, les tâches, le temps de chacune. La charge s'équilibre toute seule.">
   <title>TrioProjet — Le projet de groupe, enfin bien réparti</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='35' cy='50' r='26' fill='%230071E3'/><circle cx='68' cy='50' r='26' fill='%230071E3' fill-opacity='0.55'/></svg>">
@@ -24,11 +25,11 @@
 
   <main>
     <section class="hero">
-      <p class="eyebrow">Gratuit · Sans compte · 100&nbsp;% local</p>
+      <p class="eyebrow">Gratuit · Sans compte · Rien ne quitte votre appareil</p>
       <h1>Le projet de groupe,<br>enfin bien réparti.</h1>
       <p class="subtitle">
-        Ajoutez les membres, ajoutez les tâches.<br>
-        TrioProjet fait une répartition équitable — et personne ne peut dire rien.
+        Ajoutez les membres, listez les tâches avec le temps que chacune demande.
+        La charge s'équilibre toute seule — plus personne n'a à trancher.
       </p>
     </section>
 
@@ -37,7 +38,7 @@
       <article class="card" id="card-membres">
         <h2><span class="step">1</span> Les membres</h2>
         <form id="form-membre" class="add-row" autocomplete="off">
-          <input type="text" id="input-membre" placeholder="Prénom d'un membre…"
+          <input type="text" id="input-membre" placeholder="Prénom…"
                  maxlength="30" aria-label="Ajouter un membre">
           <button type="submit" class="btn btn-secondary">Ajouter</button>
         </form>
@@ -47,9 +48,13 @@
 
       <article class="card" id="card-taches">
         <h2><span class="step">2</span> Les tâches</h2>
-        <form id="form-tache" class="add-row" autocomplete="off">
-          <input type="text" id="input-tache" placeholder="Ex. Créer les diapositives…"
+        <form id="form-tache" class="add-row add-row-tache" autocomplete="off">
+          <input type="text" id="input-tache" placeholder="Ce qu'il faut faire…"
                  maxlength="80" aria-label="Ajouter une tâche">
+          <button type="button" id="btn-duree" class="duree-btn"
+                  aria-haspopup="dialog" title="Temps estimé pour la prochaine tâche">
+            <span id="duree-label">30 min</span><span class="chev" aria-hidden="true">▾</span>
+          </button>
           <button type="submit" class="btn btn-secondary">Ajouter</button>
         </form>
         <p class="feedback" id="feedback-tache" role="status"></p>
@@ -60,14 +65,18 @@
 
     <section class="action">
       <button class="btn btn-primary" id="btn-repartir">Répartir équitablement</button>
-      <p class="hint">Chacun son tour, dans l'ordre puis en sens inverse : c'est la règle du serpentin, celle des terrains de jeu.</p>
+      <p class="hint">Les tâches longues partent en premier, chez celui qui a le moins sur les épaules.</p>
     </section>
 
     <section class="result" id="resultat" hidden aria-live="polite">
       <div class="result-head">
-        <h2><span class="step">3</span> La répartition</h2>
+        <h2><span class="step">3</span> La répartition
+          <span class="balance-pill" id="equilibre"></span>
+        </h2>
         <div class="result-actions">
           <button class="btn btn-secondary" id="btn-copier">Copier le résultat</button>
+          <button class="btn btn-secondary" id="btn-lien">Copier le lien</button>
+          <button class="btn btn-ghost" id="btn-retirer">Redistribuer</button>
           <button class="btn btn-ghost" id="btn-recommencer">Recommencer</button>
         </div>
       </div>
@@ -77,12 +86,12 @@
 
   <footer class="footer">
     <p>
-      Open source — fait pour les étudiants, pensé pour les groupes.
-      <a href="https://github.com/StrongBug999/trioprojet" target="_blank" rel="noopener">Contribuer sur GitHub</a>
+      Open source, sans publicité, sans données collectées.
+      <a href="https://github.com/StrongBug999/trioprojet" target="_blank" rel="noopener">Proposer une amélioration</a>
     </p>
   </footer>
 
-  <div class="toast" id="toast" role="status">Copié ✓</div>
+  <div class="toast" id="toast" role="status"></div>
 
   <script src="app.js"></script>
 </body>
