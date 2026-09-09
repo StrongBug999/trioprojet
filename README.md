@@ -31,8 +31,9 @@ Le site est disponible en ligne : **https://strongbug999.github.io/trioprojet/**
 2. Listez les tâches et estimez leur durée — 30 min par défaut, modifiable
    d'un clic sur chaque tâche
 3. Cliquez sur « Répartir équitablement »
-4. Copiez le résultat pour le groupe, ou copiez le lien du projet pour le
-   partager tel quel
+4. Copiez le résultat pour le groupe, ou copiez le lien du projet :
+   il transporte les membres, les tâches **et** la répartition, prêts
+   à s'afficher chez ceux qui l'ouvrent
 
 Aucune inscription, aucune publicité, et **toutes les données restent sur
 votre appareil** : aucune requête externe, aucun serveur, aucun suivi.
@@ -40,18 +41,22 @@ votre appareil** : aucune requête externe, aucun serveur, aucun suivi.
 ## Comment l'équilibrage fonctionne
 
 Les tâches sont mélangées, classées de la plus longue à la plus courte, puis
-chacune rejoint le membre qui a le moins de temps sur les épaules. C'est
-l'heuristique *Longest Processing Time* : simple à expliquer en une phrase,
-et très difficile à battre à la main. L'écart de charge entre membres est
+chacune rejoint, tiré au sort, l'un des membres qui ont le moins de temps sur
+les épaules. C'est l'heuristique *Longest Processing Time* avec égalités
+décidées au hasard : simple à expliquer en une phrase, très difficile à
+battre à la main, et jamais prévisible — la plus grosse tâche ne revient pas
+systématiquement à la même personne. L'écart de charge entre membres est
 affiché sous le résultat — il ne dépasse jamais la durée de la plus petite
 tâche.
 
 ## Fonctionnalités
 
 - Répartition **par charge réelle** (durées estimées, pas par simple compte)
+- Tirage au sort des égalités : le résultat n'est pas mécanique — et le
+  bouton « Redistribuer » relance la loterie si le hasard déplaît
 - Durées modifiables d'un clic (10 min à 10 h, valeur libre possible)
-- **Lien de partage** : le projet tient entièrement dans l'URL, sans serveur
-- Bouton « Redistribuer » pour relancer le tirage si le hasard déplaît
+- **Lien de partage** : membres, tâches et répartition tiennent entièrement
+  dans l'URL, sans serveur
 - Résultat copiable prêt à coller dans le groupe
 - Sauvegarde automatique sur l'appareil (localStorage)
 - Zéro dépendance, zéro requête externe, fonctionne hors connexion

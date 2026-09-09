@@ -2,10 +2,11 @@
    TrioProjet — répartition équilibrée par charge
    ------------------------------------------------------------
    Méthode : les tâches sont mélangées, classées de la plus
-   longue à la plus courte, puis chacune rejoint le membre qui
-   a le moins de temps sur les épaules. C'est l'heuristique
-   "Longest Processing Time" : simple à comprendre, très
-   difficile à battre à la main.
+   longue à la plus courte, puis chacune rejoint au hasard l'un
+   des membres qui ont le moins de temps sur les épaules. C'est
+   l'heuristique "Longest Processing Time" à égalités tirées au
+   sort : simple à comprendre, difficile à battre à la main,
+   et imprévisible quand plusieurs tâches ont la même durée.
    Tout se passe sur l'appareil : aucune donnée n'est envoyée.
    ============================================================ */
 
@@ -22,6 +23,7 @@
 
   var state = { membres: [], taches: [] };
   var dureeNouvelleTache = DUREE_DEFAUT;
+  var paniersCourants = null; // dernière répartition affichée (ou null)
 
   // ---------- Raccourcis DOM ----------
 
@@ -110,14 +112,57 @@
 
   // ---------- Partage par lien (tout tient dans l'URL) ----------
 
+  // La répartition affichée, convertie en index de tâches — ou null si
+  // l'état a changé depuis le calcul (on n'encode alors que le projet).
+  function indexesRepartition() {
+    if (!paniersCourants) { return null; }
+    if (paniersCourants.length !== state.membres.length) { return null; }
+    var groupes = [];
+    for (var i = 0; i < paniersCourants.length; i++) {
+      if (paniersCourants[i].nom !== state.membres[i]) { return null; }
+      var groupe = [];
+      for (var j = 0; j < paniersCourants[i].taches.length; j++) {
+        var idx = state.taches.indexOf(paniersCourants[i].taches[j]);
+        if (idx < 0) { return null; }
+        groupe.push(idx);
+      }
+      groupes.push(groupe);
+    }
+    return groupes;
+  }
+
   function encoderEtat() {
     var compact = {
       m: state.membres,
       t: state.taches.map(function (t) { return [t.nom, t.min]; })
     };
+    var repartition = indexesRepartition();
+    if (repartition) { compact.r = repartition; }
     var json = JSON.stringify(compact);
     return btoa(unescape(encodeURIComponent(json)))
       .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  // Reconstruit une répartition encodée, ou null si elle est incohérente.
+  function reconstruireRepartition(r) {
+    if (r.length !== state.membres.length) { return null; }
+    var vues = {};
+    var paniers = [];
+    for (var i = 0; i < r.length; i++) {
+      if (!Array.isArray(r[i])) { return null; }
+      var panier = { nom: state.membres[i], taches: [], charge: 0 };
+      for (var j = 0; j < r[i].length; j++) {
+        var idx = r[i][j];
+        if (typeof idx !== "number" || idx < 0 || idx >= state.taches.length ||
+            vues[idx]) { return null; }
+        vues[idx] = true;
+        var tache = state.taches[idx];
+        panier.taches.push(tache);
+        panier.charge += tache.min;
+      }
+      paniers.push(panier);
+    }
+    return paniers;
   }
 
   function decoderEtat(chaine) {
@@ -131,6 +176,9 @@
         return typeof m === "string" && m.trim();
       });
       state.taches = compact.t.map(normaliserTache).filter(Boolean);
+      paniersCourants = Array.isArray(compact.r)
+        ? reconstruireRepartition(compact.r)
+        : null;
       return true;
     } catch (e) {
       return false;
@@ -310,6 +358,7 @@
     btn.setAttribute("aria-label", "Retirer " + ariaNom);
     btn.addEventListener("click", function () {
       liste.splice(index, 1);
+      paniersCourants = null;
       sauver();
       rendre();
     });
@@ -349,6 +398,7 @@
       badge.addEventListener("click", function () {
         ouvrirPopover(badge, tache.min, function (min) {
           tache.min = min;
+          paniersCourants = null;
           sauver();
           rendre();
         });
@@ -383,6 +433,7 @@
 
     state.membres.push(nom);
     el.inputMembre.value = "";
+    paniersCourants = null;
     sauver();
     rendre();
     el.inputMembre.focus();
@@ -404,6 +455,7 @@
     state.taches.push({ nom: nom, min: dureeNouvelleTache });
     el.inputTache.value = "";
     dureeNouvelleTache = DUREE_DEFAUT;
+    paniersCourants = null;
     majLabelDuree();
     sauver();
     rendre();
@@ -431,20 +483,26 @@
       return { nom: nom, taches: [], charge: 0 };
     });
 
-    // 2. Chaque tâche rejoint le membre le moins chargé
+    // 2. Chaque tâche rejoint, au hasard, l'un des membres les moins chargés
     taches.forEach(function (tache) {
-      var elu = 0;
+      var chargeMin = paniers[0].charge;
       for (var i = 1; i < paniers.length; i++) {
-        if (paniers[i].charge < paniers[elu].charge) { elu = i; }
+        if (paniers[i].charge < chargeMin) { chargeMin = paniers[i].charge; }
       }
+      var elus = [];
+      for (var j = 0; j < paniers.length; j++) {
+        if (paniers[j].charge === chargeMin) { elus.push(j); }
+      }
+      var elu = elus[Math.floor(Math.random() * elus.length)];
       paniers[elu].taches.push(tache);
       paniers[elu].charge += tache.min;
     });
 
+    paniersCourants = paniers;
     afficherResultat(paniers);
   }
 
-  function afficherResultat(paniers) {
+  function afficherResultat(paniers, defiler) {
     el.grille.innerHTML = "";
 
     var charges = paniers.map(function (p) { return p.charge; });
@@ -506,7 +564,9 @@
     el.btnCopier.disabled = false;
     el.btnLien.disabled = false;
     el.btnRecommencer.textContent = "Recommencer";
-    el.resultat.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (defiler !== false) {
+      el.resultat.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }
 
   // ---------- Copie du résultat ----------
@@ -518,7 +578,8 @@
       }), ""];
 
     el.grille.querySelectorAll(".member-card").forEach(function (carte) {
-      var nom = carte.querySelector(".member-name").textContent.trim();
+      // le nom est le dernier nœud de .member-name (après la pastille avatar)
+      var nom = carte.querySelector(".member-name").lastChild.textContent.trim();
       var total = carte.querySelector(".total-badge").textContent.trim();
       lignes.push(nom + " — " + total + " au total");
       carte.querySelectorAll("ul li").forEach(function (li) {
@@ -570,6 +631,7 @@
       return;
     }
     state = { membres: [], taches: [] };
+    paniersCourants = null;
     if (location.hash.indexOf("#p=") === 0) {
       history.replaceState(null, "", location.pathname);
     }
@@ -593,8 +655,13 @@
     majLabelDuree();
 
     if (importe) {
+      if (paniersCourants) {
+        afficherResultat(paniersCourants, false);
+      }
       setTimeout(function () {
-        montrerToast("Projet chargé depuis le lien");
+        montrerToast(paniersCourants
+          ? "Projet et répartition chargés depuis le lien"
+          : "Projet chargé depuis le lien");
       }, 400);
     }
 
