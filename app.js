@@ -61,13 +61,21 @@
     return data && Array.isArray(data.membres) && Array.isArray(data.taches);
   }
 
+  function bornerDuree(valeur) {
+    if (isNaN(valeur)) { return DUREE_DEFAUT; }
+    return Math.max(DUREE_MIN, Math.min(DUREE_MAX, valeur));
+  }
+
   function normaliserTache(t) {
     if (typeof t === "string") {
       return { nom: t, min: DUREE_DEFAUT };
     }
+    // Format compact du lien de partage : ["Nom de la tâche", 45]
+    if (Array.isArray(t) && typeof t[0] === "string") {
+      return { nom: t[0], min: bornerDuree(parseInt(t[1], 10)) };
+    }
     if (t && typeof t.nom === "string") {
-      var min = parseInt(t.min, 10);
-      return { nom: t.nom, min: isNaN(min) ? DUREE_DEFAUT : min };
+      return { nom: t.nom, min: bornerDuree(parseInt(t.min, 10)) };
     }
     return null;
   }
